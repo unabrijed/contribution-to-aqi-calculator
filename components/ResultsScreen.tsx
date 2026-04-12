@@ -23,17 +23,6 @@ export default function ResultsScreen({ selections, onReset }: Props) {
   return (
     <div className="animate-in">
 
-      {/* Disclaimer */}
-      <div className="flex gap-3 p-4 rounded-xl bg-ember-950/40 border border-ember-900/60 mb-8">
-        <div className="w-5 h-5 rounded-full bg-ember-600 flex items-center justify-center flex-shrink-0 mt-0.5">
-          <span className="text-white text-2xs font-bold">!</span>
-        </div>
-        <p className="text-xs text-ink-400 leading-relaxed">
-          <span className="text-ember-400 font-medium">We do not support or encourage smoking.</span>{" "}
-          This data exists to show what your habits cost. Not just your lungs, but the air everyone around you breathes.
-          If you want to quit, please speak to a medical professional.
-        </p>
-      </div>
 
       {/* ── Share card at top ──────────────────────────── */}
       <div className="mb-8 animate-in">
