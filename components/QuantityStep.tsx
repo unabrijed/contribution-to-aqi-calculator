@@ -122,12 +122,11 @@ export default function QuantityStep({ selections, onChange, onBack, onNext }: P
                 >
                   <div className="w-3 h-3 rounded-full bg-white" />
                 </div>
-                <span>
+                <div className="text-xs text-ink-500 max-w-[200px] leading-snug">
                   {s.isIndoor
-                    ? "Smoked indoors — 3.5× PM2.5 impact on others"
-                    : "Smoked outdoors — tap to change"
-                  }
-                </span>
+                    ? "Smoked indoors: 3.5x PM2.5 impact on others"
+                    : "Smoked outdoors: tap to change"}
+                </div>
               </button>
             </div>
           );

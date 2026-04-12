@@ -91,7 +91,7 @@ export default function ShareCard({ score, band, annualG, selections }: Props) {
           <div className="rounded-xl p-3" style={{ background: "rgba(255,255,255,0.04)" }}>
             <div className="text-2xs text-ink-500 font-mono mb-0.5">Top habit</div>
             <div className="text-sm font-medium text-ink-100 truncate">
-              {topBrands[0]?.brandName ?? "—"}
+              {topBrands[0]?.brandName ?? "-"}
             </div>
           </div>
         </div>
@@ -113,7 +113,7 @@ export default function ShareCard({ score, band, annualG, selections }: Props) {
         {/* Footer */}
         <div className="border-t pt-4" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
           <p className="text-2xs text-ink-600 leading-relaxed">
-            This is not a badge of honour — it's a mirror.
+            This is not a badge of honour, it&apos;s a mirror.
             Based on WHO TobLabNet & ICMR data. We do not support smoking.
           </p>
         </div>
