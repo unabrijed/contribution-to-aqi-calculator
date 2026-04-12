@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { BENCHMARKS } from "@/data/catalog";
+import { BENCHMARKS, type PPIBand } from "@/data/catalog";
 import { benchmarkEquiv, type Selection } from "@/lib/calc";
 import { useTheme } from "next-themes";
 
