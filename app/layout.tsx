@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "../components/ThemeProvider";
+import Header from "../components/Header";
 
 export const metadata: Metadata = {
-  title: "How much air do you poison? | AQI Contribution Calculator",
+  title: "Calculate your contribution to AQI | Calculator",
   description:
     "Find out how much PM2.5 your smoking habits contribute to the air and what that's equivalent to in cars, trucks, and chimneys.",
   openGraph: {
-    title: "How much air do you poison?",
-    description: "Calculate your personal PM2.5 contribution.",
+    title: "Calculate your contribution to AQI",
+    description: "Find out your personal PM2.5 contribution.",
     type: "website",
   },
   robots: {
@@ -26,6 +27,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" suppressHydrationWarning>
       <body>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <Header />
           {children}
         </ThemeProvider>
       </body>

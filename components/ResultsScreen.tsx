@@ -5,7 +5,6 @@ import { calculate, projections, benchmarkEquiv } from "@/lib/calc";
 import { getPPIBand, calcPPI, BENCHMARKS } from "@/data/catalog";
 import type { Selection } from "@/lib/calc";
 import ShareCard from "@/components/ShareCard";
-import SuggestForm from "@/components/SuggestForm";
 
 interface Props {
   selections: Selection[];
@@ -166,9 +165,6 @@ export default function ResultsScreen({ selections, onReset }: Props) {
       </div>
 
       {/* Sharecard moved to top */}
-
-      {/* ── Suggest a source ────────────────────── */}
-      <SuggestForm />
 
       {/* Start over */}
       <div className="mt-10 pt-8 border-t border-[var(--border)] flex justify-center">

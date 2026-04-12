@@ -1,8 +1,9 @@
 "use client";
 
 import { useRef, useState } from "react";
-import type { PPIBand } from "@/data/catalog";
-import type { Selection } from "@/lib/calc";
+import { BENCHMARKS } from "@/data/catalog";
+import { benchmarkEquiv, type Selection } from "@/lib/calc";
+import { useTheme } from "next-themes";
 
 interface Props {
   score: number;
@@ -14,12 +15,24 @@ interface Props {
 export default function ShareCard({ score, band, annualG, selections }: Props) {
   const cardRef  = useRef<HTMLDivElement>(null);
   const [saving, setSaving] = useState(false);
+  const { theme, systemTheme } = useTheme();
+
+  // "Pick a value from lower suggestions" - default to something impressive like petrol car
+  const defaultBmId = BENCHMARKS.find(b => b.id === "petrol_car")?.id || BENCHMARKS[0].id;
+  const [selectedBmId, setSelectedBmId] = useState<string>(defaultBmId);
 
   const topBrands = [...selections]
     .sort((a, b) => b.pm25_per_unit * b.qty - a.pm25_per_unit * a.qty)
     .slice(0, 3);
 
   const annualFmt = annualG >= 1 ? `${annualG.toFixed(1)}g` : `${Math.round(annualG * 1000)}mg`;
+
+  const currentTheme = theme === "system" ? systemTheme : theme;
+  const isDark = currentTheme === "dark";
+  const cardGradient = isDark
+    ? "linear-gradient(135deg, #0c0a09 0%, #1c1917 100%)"
+    : "linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%)";
+  const cardBgColor = isDark ? "#0c0a09" : "#ffffff";
 
   const handleDownload = async () => {
     if (!cardRef.current) return;
@@ -28,7 +41,7 @@ export default function ShareCard({ score, band, annualG, selections }: Props) {
       const html2canvas = (await import("html2canvas")).default;
       const canvas = await html2canvas(cardRef.current, {
         scale: 2,
-        backgroundColor: "#0c0a09",
+        backgroundColor: cardBgColor,
         useCORS: true,
       });
       const url = canvas.toDataURL("image/png");
@@ -41,17 +54,43 @@ export default function ShareCard({ score, band, annualG, selections }: Props) {
     }
   };
 
+  const selectedBm = BENCHMARKS.find(b => b.id === selectedBmId) || BENCHMARKS[0];
+  const equivVal = benchmarkEquiv(annualG, selectedBm.rate_mg_per_unit);
+
   return (
     <div>
+      {/* Selector for equivalent */}
+      <div className="mb-4">
+        <label className="text-xs text-[var(--text-muted)] font-mono uppercase tracking-widest mb-2 block">
+          Card highlight metric
+        </label>
+        <div className="flex flex-wrap gap-2">
+          {BENCHMARKS.map(bm => (
+            <button
+              key={bm.id}
+              onClick={() => setSelectedBmId(bm.id)}
+              className={`px-3 py-1.5 text-xs rounded-full border transition-colors ${
+                bm.id === selectedBmId 
+                  ? "border-[var(--ember)] bg-[var(--ember)]/10 text-ember-600 dark:text-ember-400" 
+                  : "border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-main)] hover:border-[var(--border-hover)]"
+              }`}
+            >
+              {bm.emoji} {bm.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* The card to be exported */}
       <div
         ref={cardRef}
         id="share-card"
-        className="w-full rounded-2xl overflow-hidden"
+        className="w-full rounded-2xl overflow-hidden relative"
         style={{
-          background: "linear-gradient(135deg, #0c0a09 0%, #1c1917 100%)",
+          background: cardGradient,
           border: `1px solid ${band.color}30`,
           padding: "2rem",
+          color: "inherit",
           fontFamily: "var(--font-display)",
         }}
       >
@@ -82,15 +121,25 @@ export default function ShareCard({ score, band, annualG, selections }: Props) {
           {band.label}
         </div>
 
+        {/* Custom Headline */}
+        <div className="mb-6">
+          <div className="text-sm font-mono text-[var(--text-muted)] mb-1">
+            My smoking habit is equivalent to...
+          </div>
+          <div className="text-2xl sm:text-3xl font-display font-semibold text-[var(--text-main)] leading-tight">
+            {equivVal.toLocaleString()} {selectedBm.unit} of a {selectedBm.label.toLowerCase()} {selectedBm.emoji}
+          </div>
+        </div>
+
         {/* Stats */}
         <div className="grid grid-cols-2 gap-3 mb-6">
-          <div className="rounded-xl p-3" style={{ background: "rgba(255,255,255,0.04)" }}>
-            <div className="text-2xs text-ink-500 font-mono mb-0.5">Annual PM2.5</div>
-            <div className="text-xl font-mono font-semibold text-ink-100">{annualFmt}</div>
+          <div className="rounded-xl p-3 bg-[var(--surface-3)]">
+            <div className="text-2xs text-[var(--text-muted)] font-mono mb-0.5">Annual PM2.5</div>
+            <div className="text-xl font-mono font-semibold text-[var(--text-main)]">{annualFmt}</div>
           </div>
-          <div className="rounded-xl p-3" style={{ background: "rgba(255,255,255,0.04)" }}>
-            <div className="text-2xs text-ink-500 font-mono mb-0.5">Top habit</div>
-            <div className="text-sm font-medium text-ink-100 truncate">
+          <div className="rounded-xl p-3 bg-[var(--surface-3)]">
+            <div className="text-2xs text-[var(--text-muted)] font-mono mb-0.5">Top habit</div>
+            <div className="text-sm font-medium text-[var(--text-main)] truncate">
               {topBrands[0]?.brandName ?? "-"}
             </div>
           </div>
@@ -101,8 +150,8 @@ export default function ShareCard({ score, band, annualG, selections }: Props) {
           <div className="space-y-1.5 mb-6">
             {topBrands.map(s => (
               <div key={s.brandId} className="flex justify-between text-xs">
-                <span className="text-ink-400">{s.brandName} × {s.qty}/day</span>
-                <span className="font-mono text-ink-500">
+                <span className="text-[var(--text-muted)]">{s.brandName} × {s.qty}/day</span>
+                <span className="font-mono text-[var(--text-main)]">
                   {Math.round(s.pm25_per_unit * s.qty * (s.daysPerWeek / 7))}mg/day
                 </span>
               </div>
@@ -111,8 +160,8 @@ export default function ShareCard({ score, band, annualG, selections }: Props) {
         )}
 
         {/* Footer */}
-        <div className="border-t pt-4" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
-          <p className="text-2xs text-ink-600 leading-relaxed">
+        <div className="border-t border-[var(--border)] pt-4">
+          <p className="text-2xs text-[var(--text-muted)] leading-relaxed">
             This is not a badge of honour, it&apos;s a mirror.
             Based on WHO TobLabNet & ICMR data. We do not support smoking.
           </p>
