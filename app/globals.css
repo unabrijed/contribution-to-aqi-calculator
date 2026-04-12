@@ -1,0 +1,138 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600;700&family=Inter:wght@300;400;500&display=swap');
+
+:root {
+  --font-display: 'Syne', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+
+  --ember: #e85d26;
+  --ember-dim: #7c2d12;
+
+  --surface-0: #0c0a09;   /* deepest bg */
+  --surface-1: #111110;   /* card bg */
+  --surface-2: #1c1917;   /* elevated card */
+  --surface-3: #292524;   /* hover state */
+
+  --border: rgba(255,255,255,0.07);
+  --border-hover: rgba(255,255,255,0.14);
+}
+
+* { box-sizing: border-box; }
+
+html {
+  background: var(--surface-0);
+  color-scheme: dark;
+}
+
+body {
+  background: var(--surface-0);
+  color: #f5f5f4;
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+}
+
+.font-mono {
+  font-family: var(--font-mono) !important;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar       { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--surface-3); border-radius: 2px; }
+
+/* ── Brand card selection ring ── */
+.brand-card-selected {
+  outline: 1.5px solid var(--ember);
+  outline-offset: -1.5px;
+}
+
+/* ── Gauge arc ── */
+.gauge-track {
+  fill: none;
+  stroke: rgba(255,255,255,0.06);
+  stroke-width: 10;
+}
+.gauge-fill {
+  fill: none;
+  stroke-width: 10;
+  stroke-linecap: round;
+  transition: stroke-dasharray 0.8s cubic-bezier(0.16,1,0.3,1);
+}
+
+/* ── Range slider ── */
+input[type="range"] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 2px;
+  background: var(--surface-3);
+  border-radius: 1px;
+  outline: none;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--ember);
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+
+/* ── Step progress ── */
+.step-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--surface-3);
+  transition: background 0.3s, width 0.3s;
+}
+.step-dot.active {
+  background: var(--ember);
+  width: 20px;
+  border-radius: 3px;
+}
+.step-dot.done { background: var(--ember-dim); }
+
+/* ── Category card hover glow ── */
+.cat-card {
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.cat-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.3s;
+  background: radial-gradient(circle at 50% 0%, rgba(232,93,38,0.12) 0%, transparent 70%);
+}
+.cat-card:hover::before { opacity: 1; }
+.cat-card.selected::before { opacity: 1; }
+.cat-card:hover  { border-color: rgba(232,93,38,0.4) !important; transform: translateY(-1px); }
+.cat-card.selected { border-color: var(--ember) !important; }
+
+/* ── Smooth transitions ── */
+.animate-in {
+  animation: slideUp 0.45s cubic-bezier(0.16,1,0.3,1) both;
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Share card export area ── */
+#share-card {
+  font-family: var(--font-display);
+}
