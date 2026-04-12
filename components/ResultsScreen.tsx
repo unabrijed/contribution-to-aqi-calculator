@@ -13,7 +13,6 @@ interface Props {
 }
 
 export default function ResultsScreen({ selections, onReset }: Props) {
-  const [showShare, setShowShare] = useState(false);
   const result = useMemo(() => calculate(selections), [selections]);
   const band    = getPPIBand(result.ppi_score);
   const projs   = projections(result.annual_pm25_g);
@@ -24,16 +23,15 @@ export default function ResultsScreen({ selections, onReset }: Props) {
   return (
     <div className="animate-in">
 
-      {/* Disclaimer */}
-      <div className="flex gap-3 p-4 rounded-xl bg-ember-950/40 border border-ember-900/60 mb-8">
-        <div className="w-5 h-5 rounded-full bg-ember-600 flex items-center justify-center flex-shrink-0 mt-0.5">
-          <span className="text-white text-2xs font-bold">!</span>
-        </div>
-        <p className="text-xs text-ink-400 leading-relaxed">
-          <span className="text-ember-400 font-medium">We do not support or encourage smoking.</span>{" "}
-          This data exists to show what your habits cost — not just your lungs, but the air everyone around you breathes.
-          If you want to quit, please speak to a medical professional.
-        </p>
+
+      {/* ── Share card at top ──────────────────────────── */}
+      <div className="mb-8 animate-in">
+        <ShareCard
+          score={result.ppi_score}
+          band={band}
+          annualG={annualG}
+          selections={selections}
+        />
       </div>
 
       {/* ── PPI Score ───────────────────────────── */}
@@ -167,30 +165,7 @@ export default function ResultsScreen({ selections, onReset }: Props) {
         </p>
       </div>
 
-      {/* ── Share card ──────────────────────────── */}
-      <div className="bg-[var(--surface-1)] border border-[var(--border)] rounded-2xl p-5 mb-4">
-        <div className="text-sm font-display font-medium text-ink-100 mb-1">Share your score</div>
-        <p className="text-xs text-ink-500 mb-4 leading-relaxed">
-          Generate a card to post on social media — to make people think about what habits cost the air.
-        </p>
-        <button
-          onClick={() => setShowShare(v => !v)}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[var(--surface-3)] border border-[var(--border-hover)] text-sm text-ink-200 hover:text-ink-100 hover:border-ink-400 transition-all"
-        >
-          {showShare ? "Hide card" : "Generate share card"}
-        </button>
-
-        {showShare && (
-          <div className="mt-5 animate-in">
-            <ShareCard
-              score={result.ppi_score}
-              band={band}
-              annualG={annualG}
-              selections={selections}
-            />
-          </div>
-        )}
-      </div>
+      {/* Sharecard moved to top */}
 
       {/* ── Suggest a source ────────────────────── */}
       <SuggestForm />

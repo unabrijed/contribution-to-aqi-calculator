@@ -8,6 +8,7 @@ import BrandStep       from "@/components/BrandStep";
 import QuantityStep    from "@/components/QuantityStep";
 import ResultsScreen   from "@/components/ResultsScreen";
 import StepBar         from "@/components/StepBar";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export type Step = "landing" | "category" | "brand" | "quantity" | "results";
 
@@ -19,7 +20,8 @@ export default function Home() {
   const currentStepIndex = ["category", "brand", "quantity", "results"].indexOf(step);
 
   return (
-    <main className="min-h-screen bg-[var(--surface-0)]">
+    <main className="min-h-screen bg-[var(--surface-0)] relative">
+      <ThemeToggle />
       {/* Ambient top glow */}
       <div
         aria-hidden
