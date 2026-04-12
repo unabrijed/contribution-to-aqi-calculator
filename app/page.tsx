@@ -8,7 +8,6 @@ import BrandStep       from "@/components/BrandStep";
 import QuantityStep    from "@/components/QuantityStep";
 import ResultsScreen   from "@/components/ResultsScreen";
 import StepBar         from "@/components/StepBar";
-import { ThemeToggle } from "@/components/ThemeToggle";
 
 export type Step = "landing" | "category" | "brand" | "quantity" | "results";
 
@@ -21,7 +20,6 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-[var(--surface-0)] relative">
-      <ThemeToggle />
       {/* Ambient top glow */}
       <div
         aria-hidden
@@ -32,16 +30,6 @@ export default function Home() {
       />
 
       <div className="relative z-10 max-w-3xl mx-auto px-4 sm:px-6 py-12">
-
-        {/* Logo mark */}
-        <div className="flex items-center gap-3 mb-12">
-          <div className="w-7 h-7 rounded-full border border-ember-500/40 flex items-center justify-center">
-            <div className="w-2.5 h-2.5 rounded-full bg-ember-500" />
-          </div>
-          <span className="text-xs font-mono text-ink-400 tracking-widest uppercase">
-            AQI Contribution
-          </span>
-        </div>
 
         {/* Step progress bar (not shown on landing/results) */}
         {step !== "landing" && step !== "results" && (
@@ -93,6 +81,11 @@ export default function Home() {
           )}
         </div>
 
+      </div>
+      
+      {/* Global Footer for suggestions */}
+      <div className="relative z-10 pb-8 text-center text-xs text-ink-400 max-w-3xl mx-auto px-4">
+        for brand suggestions for addition dm <a href="https://instagram.com/unabrijed" target="_blank" rel="noopener noreferrer" className="underline hover:text-ink-200 transition-colors">@unabrijed on instagram</a> or <a href="https://twitter.com/unabrijed" target="_blank" rel="noopener noreferrer" className="underline hover:text-ink-200 transition-colors">twitter</a>.
       </div>
     </main>
   );
