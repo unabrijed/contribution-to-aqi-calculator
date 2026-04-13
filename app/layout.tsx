@@ -5,12 +5,13 @@ import { ThemeProvider } from "../components/ThemeProvider";
 import Header from "../components/Header";
 
 export const metadata: Metadata = {
-  title: "Calculate your contribution to AQI | Calculator",
+  title: "Calculate your contribution to AQI | AQI Calc",
   description:
-    "Find out how much PM2.5 your smoking habits contribute to the air and what that's equivalent to in cars, trucks, and chimneys.",
+    "Select your smoke sources, set your daily intake, and see your real annual PM2.5 contribution. Built on WHO-based data across 70+ brands and eight categories.",
   openGraph: {
     title: "Calculate your contribution to AQI",
-    description: "Find out your personal PM2.5 contribution.",
+    description:
+      "Select your smoke sources, set your daily intake, and see your real annual PM2.5 contribution.",
     type: "website",
   },
   robots: {

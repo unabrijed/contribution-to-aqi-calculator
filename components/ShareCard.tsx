@@ -111,6 +111,9 @@ export default function ShareCard({ score, band, annualG, selections }: Props) {
             {score}
           </div>
           <div className="text-sm font-mono text-ink-400">Personal Pollution Index / 500</div>
+          <div className="text-2xs font-mono text-ink-500 mt-2 max-w-[18rem] leading-relaxed">
+            Yearly totals from your daily habits—PPI, PM2.5, and comparisons below are all on a 12‑month basis.
+          </div>
         </div>
 
         {/* Band label */}
@@ -124,7 +127,7 @@ export default function ShareCard({ score, band, annualG, selections }: Props) {
         {/* Custom Headline */}
         <div className="mb-6">
           <div className="text-sm font-mono text-[var(--text-muted)] mb-1">
-            My smoking habit is equivalent to...
+            Over one year, my habit is equivalent to…
           </div>
           <div className="text-2xl sm:text-3xl font-display font-semibold text-[var(--text-main)] leading-tight">
             {equivVal.toLocaleString()} {selectedBm.unit} of a {selectedBm.label.toLowerCase()} {selectedBm.emoji}
@@ -134,7 +137,7 @@ export default function ShareCard({ score, band, annualG, selections }: Props) {
         {/* Stats */}
         <div className="grid grid-cols-2 gap-3 mb-6">
           <div className="rounded-xl p-3 bg-[var(--surface-3)]">
-            <div className="text-2xs text-[var(--text-muted)] font-mono mb-0.5">Annual PM2.5</div>
+            <div className="text-2xs text-[var(--text-muted)] font-mono mb-0.5">Annual PM2.5 (from daily)</div>
             <div className="text-xl font-mono font-semibold text-[var(--text-main)]">{annualFmt}</div>
           </div>
           <div className="rounded-xl p-3 bg-[var(--surface-3)]">
