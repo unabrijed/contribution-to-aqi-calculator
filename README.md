@@ -1,6 +1,6 @@
 # AQI Contribution Calculator
 
-> **"How much air do you poison?"**
+> **Calculate your contribution to AQI**
 > A personal PM2.5 contribution calculator built with Next.js 14, Tailwind CSS, and TypeScript.
 
 ---

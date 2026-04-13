@@ -135,14 +135,14 @@ export default function ShareCard({ score, band, annualG, selections }: Props) {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 gap-3 mb-6">
-          <div className="rounded-xl p-3 bg-[var(--surface-3)]">
+        <div className="grid grid-cols-2 gap-3 mb-6 items-start">
+          <div className="rounded-xl p-3 bg-[var(--surface-3)] min-w-0">
             <div className="text-2xs text-[var(--text-muted)] font-mono mb-0.5">Annual PM2.5 (from daily)</div>
             <div className="text-xl font-mono font-semibold text-[var(--text-main)]">{annualFmt}</div>
           </div>
-          <div className="rounded-xl p-3 bg-[var(--surface-3)]">
+          <div className="rounded-xl p-3 bg-[var(--surface-3)] min-w-0">
             <div className="text-2xs text-[var(--text-muted)] font-mono mb-0.5">Top habit</div>
-            <div className="text-sm font-medium text-[var(--text-main)] truncate">
+            <div className="text-sm font-medium text-[var(--text-main)] break-words leading-snug">
               {topBrands[0]?.brandName ?? "-"}
             </div>
           </div>
@@ -152,9 +152,11 @@ export default function ShareCard({ score, band, annualG, selections }: Props) {
         {topBrands.length > 0 && (
           <div className="space-y-1.5 mb-6">
             {topBrands.map(s => (
-              <div key={s.brandId} className="flex justify-between text-xs">
-                <span className="text-[var(--text-muted)]">{s.brandName} × {s.qty}/day</span>
-                <span className="font-mono text-[var(--text-main)]">
+              <div key={s.brandId} className="flex justify-between gap-3 text-xs items-start">
+                <span className="text-[var(--text-muted)] min-w-0 flex-1 break-words leading-snug">
+                  {s.brandName} × {s.qty}/day
+                </span>
+                <span className="font-mono text-[var(--text-main)] shrink-0 text-right tabular-nums">
                   {Math.round(s.pm25_per_unit * s.qty * (s.daysPerWeek / 7))}mg/day
                 </span>
               </div>
