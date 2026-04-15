@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { FaInstagram, FaTwitter } from "react-icons/fa";
 import type { Selection } from "@/lib/calc";
 import LandingScreen   from "@/components/LandingScreen";
 import CategoryStep    from "@/components/CategoryStep";
@@ -8,8 +9,9 @@ import BrandStep       from "@/components/BrandStep";
 import QuantityStep    from "@/components/QuantityStep";
 import ResultsScreen   from "@/components/ResultsScreen";
 import StepBar         from "@/components/StepBar";
+import LoadingScreen   from "@/components/LoadingScreen";
 
-export type Step = "landing" | "category" | "brand" | "quantity" | "results";
+export type Step = "landing" | "category" | "brand" | "quantity" | "loading" | "results";
 
 export default function Home() {
   const [step, setStep] = useState<Step>("landing");
@@ -31,8 +33,8 @@ export default function Home() {
 
       <div className="relative z-10 max-w-3xl mx-auto px-4 sm:px-6 py-12">
 
-        {/* Step progress bar (not shown on landing/results) */}
-        {step !== "landing" && step !== "results" && (
+        {/* Step progress bar (not shown on landing/loading/results) */}
+        {step !== "landing" && step !== "results" && step !== "loading" && (
           <StepBar current={currentStepIndex} total={3} />
         )}
 
@@ -65,8 +67,12 @@ export default function Home() {
               selections={selections}
               onChange={setSelections}
               onBack={() => setStep("brand")}
-              onNext={() => setStep("results")}
+              onNext={() => setStep("loading")}
             />
+          )}
+
+          {step === "loading" && (
+            <LoadingScreen onComplete={() => setStep("results")} />
           )}
 
           {step === "results" && (
@@ -84,8 +90,31 @@ export default function Home() {
       </div>
       
       {/* Global Footer for suggestions */}
-      <div className="relative z-10 pb-8 text-center text-xs text-ink-400 max-w-3xl mx-auto px-4">
-        for brand suggestions for addition dm <a href="https://instagram.com/unabrijed" target="_blank" rel="noopener noreferrer" className="underline hover:text-ink-200 transition-colors">@unabrijed on instagram</a> or <a href="https://twitter.com/unabrijed" target="_blank" rel="noopener noreferrer" className="underline hover:text-ink-200 transition-colors">twitter</a>.
+      <div className="relative z-10 pb-12 pt-8 text-center max-w-3xl mx-auto px-4 flex flex-col items-center justify-center gap-3">
+        <p className="text-sm sm:text-base font-medium text-ink-300">
+          Have a brand suggestion to add?
+        </p>
+        <div className="flex items-center gap-3 sm:gap-4 mt-1">
+          <a
+            href="https://instagram.com/unabrijed"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-full bg-[var(--surface-1)] border border-[var(--border)] text-ink-200 hover:text-ember-500 hover:border-ember-500/30 transition-all duration-300 shadow-sm hover:shadow-md"
+          >
+            <FaInstagram className="h-4 w-4 sm:h-4.5 sm:w-4.5 transition-transform group-hover:scale-110" />
+            <span className="text-sm font-mono tracking-wide font-medium">Instagram</span>
+          </a>
+          <span className="text-ink-600 font-mono text-xs font-medium px-1">OR</span>
+          <a
+            href="https://twitter.com/unabrijed"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-full bg-[var(--surface-1)] border border-[var(--border)] text-ink-200 hover:text-ember-500 hover:border-ember-500/30 transition-all duration-300 shadow-sm hover:shadow-md"
+          >
+            <FaTwitter className="h-4 w-4 sm:h-4.5 sm:w-4.5 transition-transform group-hover:scale-110" />
+            <span className="text-sm font-mono tracking-wide font-medium">Twitter</span>
+          </a>
+        </div>
       </div>
     </main>
   );
