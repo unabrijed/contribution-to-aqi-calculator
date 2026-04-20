@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { CATEGORIES, type Brand, type Company, type Category } from "@/data/catalog";
 import type { Selection } from "@/lib/calc";
+import { searchByName } from "@/lib/search";
+import { useDebouncedValue } from "@/lib/useDebouncedValue";
 
 interface Props {
   categoryIds: string[];
@@ -14,6 +16,8 @@ interface Props {
 
 export default function BrandStep({ categoryIds, selections, onChange, onBack, onNext }: Props) {
   const [activeTab, setActiveTab] = useState(categoryIds[0]);
+  const [search, setSearch] = useState("");
+  const debouncedSearch = useDebouncedValue(search);
   const categories = CATEGORIES.filter(c => categoryIds.includes(c.id));
 
   const isSelected = (brandId: string) => selections.some(s => s.brandId === brandId);
@@ -39,6 +43,14 @@ export default function BrandStep({ categoryIds, selections, onChange, onBack, o
   };
 
   const activeCat = categories.find(c => c.id === activeTab)!;
+  const visibleCompanies = debouncedSearch.trim()
+    ? activeCat.companies
+        .map(company => ({
+          ...company,
+          brands: searchByName(company.brands, debouncedSearch, brand => brand.name),
+        }))
+        .filter(company => company.brands.length > 0)
+    : activeCat.companies;
 
   return (
     <div>
@@ -68,9 +80,16 @@ export default function BrandStep({ categoryIds, selections, onChange, onBack, o
         </div>
       )}
 
+      <SearchBox
+        value={search}
+        onChange={setSearch}
+        placeholder={`Search ${activeCat.label.toLowerCase()} brands...`}
+        className="mb-5"
+      />
+
       {/* Companies + brands */}
       <div className="space-y-6 mb-8">
-        {activeCat.companies.map(company => (
+        {visibleCompanies.map(company => (
           <div key={company.id}>
             {/* Company header */}
             <div className="flex items-center gap-3 mb-3">
@@ -170,6 +189,12 @@ export default function BrandStep({ categoryIds, selections, onChange, onBack, o
         ))}
       </div>
 
+      {visibleCompanies.length === 0 && (
+        <div className="mb-8 rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-6 text-center text-sm text-ink-500">
+          No brands match “{debouncedSearch}”.
+        </div>
+      )}
+
       {/* Footer */}
       <div className="flex items-center justify-between">
         <button
@@ -200,4 +225,20 @@ function getPm25Color(pm25: number): string {
   if (pm25 <  50)  return "#eab308";
   if (pm25 < 100)  return "#f97316";
   return "#ef4444";
+}
+
+
+function SearchBox({ value, onChange, placeholder, className = "" }: { value: string; onChange: (value: string) => void; placeholder: string; className?: string }) {
+  return (
+    <div className={["relative", className].join(" ")}>
+      <input
+        type="search"
+        value={value}
+        onChange={e => onChange(e.target.value)}
+        placeholder={placeholder}
+        className="w-full rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] px-4 py-3 pl-10 text-sm text-ink-100 placeholder:text-ink-600 outline-none transition-all focus:border-ember-500/60 focus:ring-2 focus:ring-ember-500/10"
+      />
+      <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-600">⌕</span>
+    </div>
+  );
 }

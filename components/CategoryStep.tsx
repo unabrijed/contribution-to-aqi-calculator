@@ -1,6 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import { CATEGORIES } from "@/data/catalog";
+import { searchByName } from "@/lib/search";
+import { useDebouncedValue } from "@/lib/useDebouncedValue";
 
 interface Props {
   selected: string[];
@@ -9,6 +12,10 @@ interface Props {
 }
 
 export default function CategoryStep({ selected, onChange, onNext }: Props) {
+  const [search, setSearch] = useState("");
+  const debouncedSearch = useDebouncedValue(search);
+  const visibleCategories = searchByName(CATEGORIES, debouncedSearch, cat => cat.label);
+
   const toggle = (id: string) => {
     onChange(
       selected.includes(id) ? selected.filter(s => s !== id) : [...selected, id]
@@ -26,8 +33,15 @@ export default function CategoryStep({ selected, onChange, onNext }: Props) {
         </p>
       </div>
 
+      <SearchBox
+        value={search}
+        onChange={setSearch}
+        placeholder="Search categories..."
+        className="mb-5"
+      />
+
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
-        {CATEGORIES.map(cat => {
+        {visibleCategories.map(cat => {
           const isSelected = selected.includes(cat.id);
           return (
             <button
@@ -72,6 +86,12 @@ export default function CategoryStep({ selected, onChange, onNext }: Props) {
         })}
       </div>
 
+      {visibleCategories.length === 0 && (
+        <div className="mb-8 rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-6 text-center text-sm text-ink-500">
+          No categories match “{debouncedSearch}”.
+        </div>
+      )}
+
       {/* Next */}
       <div className="flex items-center justify-between">
         <span className="text-sm text-ink-500 font-mono">
@@ -95,4 +115,20 @@ function getPM25Range(catId: string): string {
   const all = cat.companies.flatMap(co => co.brands.map(b => b.pm25));
   const mn = Math.min(...all), mx = Math.max(...all);
   return mn === mx ? `${mn} mg/use` : `${mn}–${mx} mg/use`;
+}
+
+
+function SearchBox({ value, onChange, placeholder, className = "" }: { value: string; onChange: (value: string) => void; placeholder: string; className?: string }) {
+  return (
+    <div className={["relative", className].join(" ")}>
+      <input
+        type="search"
+        value={value}
+        onChange={e => onChange(e.target.value)}
+        placeholder={placeholder}
+        className="w-full rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] px-4 py-3 pl-10 text-sm text-ink-100 placeholder:text-ink-600 outline-none transition-all focus:border-ember-500/60 focus:ring-2 focus:ring-ember-500/10"
+      />
+      <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-600">⌕</span>
+    </div>
+  );
 }
