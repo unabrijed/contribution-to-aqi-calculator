@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { FaInstagram, FaTwitter } from "react-icons/fa";
-import { ExternalLink, Wind } from "lucide-react";
+import { Wind } from "lucide-react";
 import type { Selection } from "@/lib/calc";
 import LandingScreen   from "@/components/LandingScreen";
 import CategoryStep    from "@/components/CategoryStep";
@@ -120,15 +120,6 @@ export default function Home() {
           >
             <FaTwitter className="h-4 w-4 sm:h-4.5 sm:w-4.5 transition-transform group-hover:scale-110" />
             <span className="text-sm font-mono tracking-wide font-medium">Twitter</span>
-          </a>
-          <a
-            href="https://www.unabrijed.xyz"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-full bg-[var(--surface-1)] border border-[var(--border)] text-ink-200 hover:text-ember-500 hover:border-ember-500/30 transition-all duration-300 shadow-sm hover:shadow-md"
-          >
-            <ExternalLink className="h-4 w-4 sm:h-4.5 sm:w-4.5 transition-transform group-hover:scale-110" />
-            <span className="text-sm font-mono tracking-wide font-medium">Portfolio</span>
           </a>
         </div>
       </div>
