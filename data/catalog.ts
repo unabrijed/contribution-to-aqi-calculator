@@ -36,6 +36,8 @@ export interface Category {
   description: string;
   bgClass: string;       // tailwind bg for category card
   accentHex: string;
+  /** Typical use is indoors (e.g. hookah lounge); drives default PM2.5 exposure multiplier in the flow. */
+  defaultIsIndoor: boolean;
   companies: Company[];
 }
 
@@ -48,6 +50,7 @@ export const CATEGORIES: Category[] = [
     description: "Standard filter and non-filter cigarettes",
     bgClass: "from-amber-950/60 to-ink-900",
     accentHex: "#e85d26",
+    defaultIsIndoor: false,
     companies: [
       {
         id: "itc",
@@ -138,6 +141,7 @@ export const CATEGORIES: Category[] = [
     description: "Hand-rolled Indian tobacco in tendu leaf",
     bgClass: "from-yellow-950/60 to-ink-900",
     accentHex: "#a16207",
+    defaultIsIndoor: false,
     companies: [
       {
         id: "bidi_mfr",
@@ -163,6 +167,7 @@ export const CATEGORIES: Category[] = [
     description: "~60 min water-pipe session with natural charcoal",
     bgClass: "from-teal-950/60 to-ink-900",
     accentHex: "#0d9488",
+    defaultIsIndoor: true,
     companies: [
       {
         id: "alfakher",
@@ -219,6 +224,7 @@ export const CATEGORIES: Category[] = [
     description: "~150 puff session. Wattage and liquid affect PM2.5.",
     bgClass: "from-blue-950/60 to-ink-900",
     accentHex: "#3b82f6",
+    defaultIsIndoor: false,
     companies: [
       {
         id: "open_systems",
@@ -263,6 +269,7 @@ export const CATEGORIES: Category[] = [
     description: "Hand-rolled premium to machine-made cigarillos",
     bgClass: "from-orange-950/60 to-ink-900",
     accentHex: "#c2410c",
+    defaultIsIndoor: false,
     companies: [
       {
         id: "premium_cigars",
@@ -297,6 +304,7 @@ export const CATEGORIES: Category[] = [
     description: "Cannabis, tobacco-cannabis mix, or blunt",
     bgClass: "from-green-950/60 to-ink-900",
     accentHex: "#16a34a",
+    defaultIsIndoor: false,
     companies: [
       {
         id: "joint_types",
@@ -320,6 +328,7 @@ export const CATEGORIES: Category[] = [
     description: "Direct-draw clay or stone pipe",
     bgClass: "from-stone-950/60 to-ink-900",
     accentHex: "#78716c",
+    defaultIsIndoor: true,
     companies: [
       {
         id: "chillum_types",
@@ -343,6 +352,7 @@ export const CATEGORIES: Category[] = [
     description: "Briar / meerschaum pipe, ~20 min session",
     bgClass: "from-red-950/60 to-ink-900",
     accentHex: "#991b1b",
+    defaultIsIndoor: true,
     companies: [
       {
         id: "pipe_tobaccos",

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaInstagram, FaTwitter } from "react-icons/fa";
 import { Wind } from "lucide-react";
 import type { Selection } from "@/lib/calc";
@@ -18,6 +18,10 @@ export default function Home() {
   const [step, setStep] = useState<Step>("landing");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selections, setSelections] = useState<Selection[]>([]);
+
+  useEffect(() => {
+    setSelections(prev => prev.filter(s => selectedCategories.includes(s.categoryId)));
+  }, [selectedCategories]);
 
   const currentStepIndex = ["category", "brand", "quantity", "results"].indexOf(step);
 
