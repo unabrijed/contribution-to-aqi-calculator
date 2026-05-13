@@ -1,9 +1,10 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useMemo } from "react";
 import { BENCHMARKS, type PPIBand } from "@/data/catalog";
 import { benchmarkEquiv, type Selection } from "@/lib/calc";
 import { useTheme } from "next-themes";
+import { Share2 } from "lucide-react";
 
 interface Props {
   score: number;
@@ -14,8 +15,19 @@ interface Props {
 
 export default function ShareCard({ score, band, annualG, selections }: Props) {
   const cardRef  = useRef<HTMLDivElement>(null);
-  const [saving, setSaving] = useState(false);
+  const [exporting, setExporting] = useState(false);
   const { theme, systemTheme } = useTheme();
+
+  const canShareFile = useMemo(() => {
+    if (typeof navigator === "undefined") return false;
+    try {
+      const b = new Blob([""], { type: "image/png" });
+      const f = new File([b], "test.png", { type: "image/png" });
+      return !!navigator.canShare && navigator.canShare({ files: [f] });
+    } catch {
+      return false;
+    }
+  }, []);
 
   // "Pick a value from lower suggestions" - default to something impressive like petrol car
   const defaultBmId = BENCHMARKS.find(b => b.id === "petrol_car")?.id || BENCHMARKS[0].id;
@@ -34,23 +46,54 @@ export default function ShareCard({ score, band, annualG, selections }: Props) {
     : "linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%)";
   const cardBgColor = isDark ? "#0c0a09" : "#ffffff";
 
-  const handleDownload = async () => {
-    if (!cardRef.current) return;
-    setSaving(true);
+  const generatePngBlob = async (): Promise<Blob | null> => {
+    if (!cardRef.current) return null;
+    const html2canvas = (await import("html2canvas")).default;
+    const canvas = await html2canvas(cardRef.current, {
+      scale: 2,
+      backgroundColor: cardBgColor,
+      useCORS: true,
+    });
+    return new Promise((resolve) => {
+      canvas.toBlob((blob) => resolve(blob), "image/png");
+    });
+  };
+
+  const downloadPng = async () => {
+    const blob = await generatePngBlob();
+    if (!blob) return;
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `my-aqi-score-${score}.png`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleShare = async () => {
+    setExporting(true);
     try {
-      const html2canvas = (await import("html2canvas")).default;
-      const canvas = await html2canvas(cardRef.current, {
-        scale: 2,
-        backgroundColor: cardBgColor,
-        useCORS: true,
-      });
-      const url = canvas.toDataURL("image/png");
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `my-aqi-score-${score}.png`;
-      a.click();
+      const blob = await generatePngBlob();
+      if (!blob) return;
+
+      if (canShareFile) {
+        const file = new File([blob], `my-aqi-score-${score}.png`, { type: "image/png" });
+        try {
+          await navigator.share({
+            title: "My AQI Contribution",
+            text: `My PPI score is ${score}/500 — check yours`,
+            url: window.location.href,
+            files: [file],
+          });
+        } catch (err: unknown) {
+          if (err instanceof DOMException && err.name === "AbortError") return;
+          await downloadPng();
+        }
+      } else {
+        await downloadPng();
+      }
     } finally {
-      setSaving(false);
+      setExporting(false);
     }
   };
 
@@ -173,13 +216,18 @@ export default function ShareCard({ score, band, annualG, selections }: Props) {
         </div>
       </div>
 
-      {/* Download button */}
+      {/* Share / Download button */}
       <button
-        onClick={handleDownload}
-        disabled={saving}
+        onClick={handleShare}
+        disabled={exporting}
         className="mt-4 flex items-center gap-2 px-5 py-2.5 rounded-full bg-ember-500 text-white text-sm font-medium hover:bg-ember-600 disabled:opacity-50 transition-all active:scale-[0.98]"
       >
-        {saving ? "Saving…" : "↓ Download card"}
+        {exporting
+          ? (canShareFile ? "Sharing…" : "Saving…")
+          : canShareFile
+            ? <><Share2 className="w-4 h-4" /> Share card</>
+            : "↓ Download card"
+        }
       </button>
     </div>
   );
