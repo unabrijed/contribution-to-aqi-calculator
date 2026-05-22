@@ -107,20 +107,26 @@ export default function ShareCard({ score, band, annualG, selections }: Props) {
         <label className="text-xs text-[var(--text-muted)] font-mono uppercase tracking-widest mb-2 block">
           Card highlight metric
         </label>
-        <div className="flex flex-wrap gap-2">
-          {BENCHMARKS.map(bm => (
-            <button
-              key={bm.id}
-              onClick={() => setSelectedBmId(bm.id)}
-              className={`px-3 py-1.5 text-xs rounded-full border transition-colors ${
-                bm.id === selectedBmId 
-                  ? "border-[var(--ember)] bg-[var(--ember)]/10 text-ember-600 dark:text-ember-400" 
-                  : "border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-main)] hover:border-[var(--border-hover)]"
-              }`}
-            >
-              {bm.emoji} {bm.label}
-            </button>
-          ))}
+        <div className="flex flex-wrap gap-2" role="group" aria-label="Choose a benchmark to highlight on the card">
+          {BENCHMARKS.map(bm => {
+            const isActive = bm.id === selectedBmId;
+            return (
+              <button
+                key={bm.id}
+                type="button"
+                onClick={() => setSelectedBmId(bm.id)}
+                aria-pressed={isActive}
+                aria-label={`${bm.label} benchmark${isActive ? ", selected" : ""}`}
+                className={`px-3 py-1.5 min-h-[36px] text-xs rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-0)] ${
+                  isActive
+                    ? "border-[var(--ember)] bg-[var(--ember)]/10 text-ember-600 dark:text-ember-400" 
+                    : "border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-main)] hover:border-[var(--border-hover)]"
+                }`}
+              >
+                <span aria-hidden>{bm.emoji}</span> {bm.label}
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -218,14 +224,17 @@ export default function ShareCard({ score, band, annualG, selections }: Props) {
 
       {/* Share / Download button */}
       <button
+        type="button"
         onClick={handleShare}
         disabled={exporting}
-        className="mt-4 flex items-center gap-2 px-5 py-2.5 rounded-full bg-ember-500 text-white text-sm font-medium hover:bg-ember-600 disabled:opacity-50 transition-all active:scale-[0.98]"
+        aria-busy={exporting}
+        aria-label={exporting ? (canShareFile ? "Sharing your card…" : "Saving your card…") : canShareFile ? "Share card as image" : "Download card as PNG"}
+        className="mt-4 flex items-center gap-2 px-5 py-2.5 min-h-[44px] rounded-full bg-ember-500 text-white text-sm font-medium hover:bg-ember-600 disabled:opacity-50 transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-0)]"
       >
         {exporting
           ? (canShareFile ? "Sharing…" : "Saving…")
           : canShareFile
-            ? <><Share2 className="w-4 h-4" /> Share card</>
+            ? <><Share2 className="w-4 h-4" aria-hidden /> Share card</>
             : "↓ Download card"
         }
       </button>

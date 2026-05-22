@@ -36,7 +36,7 @@ export default function LoadingScreen({ onComplete }: { onComplete: () => void }
   }, [onComplete]);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[50vh]">
+    <div className="flex flex-col items-center justify-center min-h-[75vh]">
       <motion.div
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}

@@ -7,7 +7,7 @@ export default function LandingScreen({ onStart }: Props) {
     <div className="py-8">
       {/* Disclaimer pill */}
       <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-ember-800/60 bg-ember-950/40 mb-10">
-        <span className="w-1.5 h-1.5 rounded-full bg-ember-500 animate-pulse" />
+        <span className="w-1.5 h-1.5 rounded-full bg-ember-500 animate-pulse" aria-hidden />
         <span className="text-xs font-mono text-ember-400 tracking-wide">
           We do not support or encourage smoking
         </span>
@@ -24,11 +24,11 @@ export default function LandingScreen({ onStart }: Props) {
       </p>
 
       {/* Stat pills */}
-      <div className="flex flex-wrap gap-3 mb-12">
+      <div className="flex flex-wrap gap-3 mb-12" aria-label="Key facts">
         {[
-          { val: "70+",  label: "brands tracked" },
-          { val: "8",    label: "smoke categories" },
-          { val: "PM2.5",label: "based on WHO data" },
+          { val: "70+",   label: "brands tracked" },
+          { val: "8",     label: "smoke categories" },
+          { val: "PM2.5", label: "based on WHO data" },
         ].map(({ val, label }) => (
           <div
             key={val}
@@ -42,14 +42,13 @@ export default function LandingScreen({ onStart }: Props) {
 
       {/* CTA */}
       <button
+        type="button"
         onClick={onStart}
-        className="group flex items-center gap-3 px-7 py-4 rounded-full bg-ember-500 text-white font-display font-semibold text-base hover:bg-ember-600 active:scale-[0.98] transition-all duration-200"
+        className="group flex items-center gap-3 px-8 py-4 min-h-[52px] rounded-full bg-ember-500 text-white font-display font-semibold text-base hover:bg-ember-600 active:scale-[0.98] transition-all duration-200 shadow-lg shadow-ember-500/20 hover:shadow-ember-500/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember-400 focus-visible:ring-offset-4 focus-visible:ring-offset-[var(--surface-0)]"
       >
         Start calculating
-        <span className="inline-block transition-transform group-hover:translate-x-1">→</span>
+        <span className="inline-block transition-transform group-hover:translate-x-1" aria-hidden>→</span>
       </button>
-
-
     </div>
   );
 }

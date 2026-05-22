@@ -5,6 +5,7 @@ import { calculate, projections, benchmarkEquiv } from "@/lib/calc";
 import { getPPIBand, calcPPI, BENCHMARKS } from "@/data/catalog";
 import type { Selection } from "@/lib/calc";
 import ShareCard from "@/components/ShareCard";
+import ShoonyaProductCard from "@/components/ShoonyaProductCard";
 
 interface Props {
   selections: Selection[];
@@ -22,8 +23,12 @@ export default function ResultsScreen({ selections, onReset }: Props) {
   return (
     <div className="animate-in">
 
+      {/* ── Shoonya product card — top priority ─── */}
+      <div className="mb-6 animate-in">
+        <ShoonyaProductCard />
+      </div>
 
-      {/* ── Share card at top ──────────────────────────── */}
+      {/* ── Share card ─────────────────────────── */}
       <div className="mb-8 animate-in">
         <ShareCard
           score={result.ppi_score}
@@ -169,8 +174,9 @@ export default function ResultsScreen({ selections, onReset }: Props) {
       {/* Start over */}
       <div className="mt-10 pt-8 border-t border-[var(--border)] flex justify-center">
         <button
+          type="button"
           onClick={onReset}
-          className="text-sm text-ink-500 hover:text-ink-300 transition-colors"
+          className="text-sm text-ink-500 hover:text-ink-300 transition-colors min-h-[44px] px-4 flex items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember-400 focus-visible:rounded"
         >
           ← start over
         </button>

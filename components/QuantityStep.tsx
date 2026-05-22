@@ -5,6 +5,7 @@ import { CATEGORIES } from "@/data/catalog";
 import { searchByName } from "@/lib/search";
 import { useDebouncedValue } from "@/lib/useDebouncedValue";
 import type { Selection } from "@/lib/calc";
+import { SearchBox, SearchEmptyState, IndoorOutdoorFact } from "@/components/SearchBox";
 
 interface Props {
   selections: Selection[];
@@ -46,17 +47,17 @@ export default function QuantityStep({ selections, onChange, onBack, onNext }: P
       </div>
 
       {needsReview && (
-        <div className="mb-5 rounded-2xl border border-ember-500/20 bg-ember-500/10 p-4">
+        <div className="mb-5 rounded-2xl border border-ember-500/20 bg-ember-500/10 p-4" role="status">
           <div className="flex items-center justify-between gap-4">
             <div>
               <div className="text-sm font-medium text-ink-100">
                 Confirm every selected item
               </div>
               <p className="mt-1 text-xs leading-relaxed text-ink-500">
-                You picked multiple brands/categories. Update the quantity and regularity for each one, or tap “Looks right” if the defaults are correct.
+                You picked multiple brands/categories. Update the quantity and regularity for each one, or tap &ldquo;Looks right&rdquo; if the defaults are correct.
               </p>
             </div>
-            <div className="shrink-0 rounded-full bg-[var(--surface-1)] px-3 py-1.5 text-xs font-mono text-ember-400">
+            <div className="shrink-0 rounded-full bg-[var(--surface-1)] px-3 py-1.5 text-xs font-mono text-ember-400" aria-live="polite">
               {reviewedCount}/{selections.length} reviewed
             </div>
           </div>
@@ -67,6 +68,7 @@ export default function QuantityStep({ selections, onChange, onBack, onNext }: P
         value={search}
         onChange={setSearch}
         placeholder="Search selected brands..."
+        label="Search your selected brands"
         className="mb-5"
       />
 
@@ -95,6 +97,7 @@ export default function QuantityStep({ selections, onChange, onBack, onNext }: P
                       border: `1px solid ${co?.accentColor ?? "#e85d26"}35`,
                       color: co?.accentColor ?? "#e85d26",
                     }}
+                    aria-hidden
                   >
                     {co?.logoInitials ?? "?"}
                   </div>
@@ -108,11 +111,11 @@ export default function QuantityStep({ selections, onChange, onBack, onNext }: P
                     <div className={[
                       "mb-1 text-2xs font-mono",
                       isReviewed ? "text-green-500" : "text-ember-400",
-                    ].join(" ")}>
+                    ].join(" ")} aria-live="polite">
                       {isReviewed ? "reviewed" : `review ${index + 1}/${selections.length}`}
                     </div>
                   )}
-                  <div className="text-xs font-mono text-ember-400">
+                  <div className="text-xs font-mono text-ember-400" aria-label={`${Math.round(s.pm25_per_unit * s.qty * (s.daysPerWeek / 7))} milligrams PM2.5 per day`}>
                     {Math.round(s.pm25_per_unit * s.qty * (s.daysPerWeek / 7))} mg/day
                   </div>
                 </div>
@@ -125,19 +128,23 @@ export default function QuantityStep({ selections, onChange, onBack, onNext }: P
                     <div className="text-xs font-medium text-ink-300">Amount on a use day</div>
                     <div className="text-2xs text-ink-600">{cat?.unitLabel}</div>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3" role="group" aria-label={`Quantity for ${s.brandName}`}>
                     <button
+                      type="button"
                       onClick={() => update(s.brandId, { qty: Math.max(0.5, s.qty - (s.qty > 1 ? 1 : 0.5)) })}
-                      className="w-8 h-8 rounded-full bg-[var(--surface-3)] border border-[var(--border)] text-ink-300 hover:bg-[var(--surface-2)] hover:text-ink-100 transition-all text-lg leading-none flex items-center justify-center"
+                      aria-label={`Decrease quantity for ${s.brandName}`}
+                      className="w-10 h-10 rounded-full bg-[var(--surface-3)] border border-[var(--border)] text-ink-300 hover:bg-[var(--surface-2)] hover:text-ink-100 transition-all text-lg leading-none flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember-400"
                     >
                       −
                     </button>
-                    <span className="w-10 text-center text-base font-mono font-medium text-ink-100 tabular-nums">
+                    <span className="w-10 text-center text-base font-mono font-medium text-ink-100 tabular-nums" aria-live="polite" aria-label={`Current quantity: ${s.qty % 1 === 0 ? s.qty : s.qty.toFixed(1)}`}>
                       {s.qty % 1 === 0 ? s.qty : s.qty.toFixed(1)}
                     </span>
                     <button
+                      type="button"
                       onClick={() => update(s.brandId, { qty: s.qty + 1 })}
-                      className="w-8 h-8 rounded-full bg-[var(--surface-3)] border border-[var(--border)] text-ink-300 hover:bg-[var(--surface-2)] hover:text-ink-100 transition-all text-lg leading-none flex items-center justify-center"
+                      aria-label={`Increase quantity for ${s.brandName}`}
+                      className="w-10 h-10 rounded-full bg-[var(--surface-3)] border border-[var(--border)] text-ink-300 hover:bg-[var(--surface-2)] hover:text-ink-100 transition-all text-lg leading-none flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember-400"
                     >
                       +
                     </button>
@@ -154,59 +161,71 @@ export default function QuantityStep({ selections, onChange, onBack, onNext }: P
                       In a typical week, on how many days do you use this?
                     </div>
                   </div>
-                  <span className="shrink-0 rounded-full bg-[var(--surface-1)] px-2.5 py-1 text-2xs font-mono text-ink-300">
+                  <span className="shrink-0 rounded-full bg-[var(--surface-1)] px-2.5 py-1 text-2xs font-mono text-ink-300" aria-live="polite">
                     {formatRegularity(s.daysPerWeek)}
                   </span>
                 </div>
-                <div className="grid grid-cols-7 gap-1.5">
+                <div className="grid grid-cols-7 gap-1.5" role="group" aria-label={`Days per week for ${s.brandName}`}>
                   {[1, 2, 3, 4, 5, 6, 7].map(dayCount => (
                     <button
                       key={dayCount}
+                      type="button"
                       onClick={() => update(s.brandId, { daysPerWeek: dayCount })}
+                      aria-pressed={s.daysPerWeek === dayCount}
+                      aria-label={`${dayCount} ${dayCount === 1 ? "day" : "days"} per week`}
                       className={[
-                        "rounded-lg border px-1 py-2 text-center transition-all",
+                        "rounded-lg border px-1 py-2 text-center transition-all min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember-400",
                         s.daysPerWeek === dayCount
                           ? "border-ember-500/60 bg-ember-500/15 text-ember-400"
                           : "border-[var(--border)] bg-[var(--surface-1)] text-ink-500 hover:border-[var(--border-hover)] hover:text-ink-300",
                       ].join(" ")}
-                      aria-label={`${dayCount} ${dayCount === 1 ? "day" : "days"} per week`}
                     >
                       <span className="block text-sm font-mono">{dayCount}</span>
-                      <span className="block text-[9px] leading-none">{dayCount === 7 ? "daily" : "days"}</span>
+                      <span className="block text-[9px] leading-none" aria-hidden>{dayCount === 7 ? "daily" : "days"}</span>
                     </button>
                   ))}
                 </div>
               </div>
 
               {/* Indoor toggle */}
-              <button
-                onClick={() => update(s.brandId, { isIndoor: !s.isIndoor })}
-                className={[
-                  "flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs border transition-all duration-200 w-full",
-                  s.isIndoor
-                    ? "bg-ember-950/60 border-ember-700/50 text-ember-300"
-                    : "bg-[var(--surface-2)] border-[var(--border)] text-ink-500 hover:border-[var(--border-hover)]",
-                ].join(" ")}
-              >
-                <div
+              <div>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={s.isIndoor}
+                  aria-label={`Smoking location for ${s.brandName}: currently ${s.isIndoor ? "indoors" : "outdoors"}. Toggle to change.`}
+                  onClick={() => update(s.brandId, { isIndoor: !s.isIndoor })}
                   className={[
-                    "w-7 h-4 rounded-full flex items-center px-0.5 transition-all duration-300",
-                    s.isIndoor ? "bg-ember-500 justify-end" : "bg-[var(--surface-3)] justify-start",
+                    "flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-xs border transition-all duration-200 w-full min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember-400",
+                    s.isIndoor
+                      ? "bg-ember-950/60 border-ember-700/50 text-ember-300"
+                      : "bg-[var(--surface-2)] border-[var(--border)] text-ink-500 hover:border-[var(--border-hover)]",
                   ].join(" ")}
                 >
-                  <div className="w-3 h-3 rounded-full bg-white" />
-                </div>
-                <div className="text-xs text-ink-500 max-w-[200px] leading-snug">
-                  {s.isIndoor
-                    ? "Smoked indoors: 3.5x PM2.5 impact on others"
-                    : "Smoked outdoors: tap to change"}
-                </div>
-              </button>
+                  <div
+                    className={[
+                      "w-7 h-4 rounded-full flex items-center px-0.5 transition-all duration-300 shrink-0",
+                      s.isIndoor ? "bg-ember-500 justify-end" : "bg-[var(--surface-3)] justify-start",
+                    ].join(" ")}
+                    aria-hidden
+                  >
+                    <div className="w-3 h-3 rounded-full bg-white" />
+                  </div>
+                  <span className="text-xs">
+                    {s.isIndoor
+                      ? "Smoked indoors"
+                      : "Smoked outdoors — tap to change"}
+                  </span>
+                </button>
+                <IndoorOutdoorFact />
+              </div>
 
               {needsReview && !isReviewed && (
                 <button
+                  type="button"
                   onClick={() => markReviewed(s.brandId)}
-                  className="mt-3 w-full rounded-lg border border-ember-500/30 bg-ember-500/10 px-3 py-2 text-xs font-medium text-ember-400 transition-all hover:bg-ember-500/15"
+                  aria-label={`Confirm ${s.brandName} details look right`}
+                  className="mt-3 w-full min-h-[44px] rounded-lg border border-ember-500/30 bg-ember-500/10 px-3 py-2 text-xs font-medium text-ember-400 transition-all hover:bg-ember-500/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember-400"
                 >
                   Looks right — confirm this item
                 </button>
@@ -216,16 +235,14 @@ export default function QuantityStep({ selections, onChange, onBack, onNext }: P
         })}
       </div>
 
-      {visibleSelections.length === 0 && (
-        <div className="mb-8 rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-6 text-center text-sm text-ink-500">
-          No selected brands match “{debouncedSearch}”.
-        </div>
+      {visibleSelections.length === 0 && debouncedSearch && (
+        <SearchEmptyState query={debouncedSearch} context="selections" />
       )}
 
       {/* Running daily total */}
       <div className="flex items-center justify-between p-4 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] mb-6">
         <span className="text-sm text-ink-400">Estimated daily PM2.5</span>
-        <span className="text-lg font-mono font-medium text-ember-400">
+        <span className="text-lg font-mono font-medium text-ember-400" aria-live="polite" aria-label={`Estimated daily PM2.5: ${totalDailyMg >= 1000 ? `${(totalDailyMg / 1000).toFixed(2)} grams` : `${Math.round(totalDailyMg)} milligrams`}`}>
           {totalDailyMg >= 1000
             ? `${(totalDailyMg / 1000).toFixed(2)}g`
             : `${Math.round(totalDailyMg)}mg`
@@ -235,13 +252,19 @@ export default function QuantityStep({ selections, onChange, onBack, onNext }: P
 
       {/* Footer */}
       <div className="flex items-center justify-between">
-        <button onClick={onBack} className="text-sm text-ink-500 hover:text-ink-300 transition-colors">
+        <button
+          type="button"
+          onClick={onBack}
+          className="text-sm text-ink-500 hover:text-ink-300 transition-colors min-h-[44px] flex items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember-400 focus-visible:rounded"
+        >
           ← back
         </button>
         <button
+          type="button"
           onClick={onNext}
           disabled={!allReviewed}
-          className="flex items-center gap-2 px-6 py-3 rounded-full bg-ember-500 text-white font-display font-medium text-sm hover:bg-ember-600 active:scale-[0.98] transition-all disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-ember-500"
+          aria-disabled={!allReviewed}
+          className="flex items-center gap-2 px-6 py-3 min-h-[44px] rounded-full bg-ember-500 text-white font-display font-medium text-sm hover:bg-ember-600 active:scale-[0.98] transition-all disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-ember-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-0)]"
         >
           {allReviewed ? "Calculate my impact →" : `Review ${selections.length - reviewedCount} more →`}
         </button>
@@ -254,20 +277,4 @@ function formatRegularity(daysPerWeek: number): string {
   if (daysPerWeek === 7) return "Daily";
   if (daysPerWeek === 1) return "1 day/week";
   return `${daysPerWeek} days/week`;
-}
-
-
-function SearchBox({ value, onChange, placeholder, className = "" }: { value: string; onChange: (value: string) => void; placeholder: string; className?: string }) {
-  return (
-    <div className={["relative", className].join(" ")}>
-      <input
-        type="search"
-        value={value}
-        onChange={e => onChange(e.target.value)}
-        placeholder={placeholder}
-        className="w-full rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] px-4 py-3 pl-10 text-sm text-ink-100 placeholder:text-ink-600 outline-none transition-all focus:border-ember-500/60 focus:ring-2 focus:ring-ember-500/10"
-      />
-      <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-600">⌕</span>
-    </div>
-  );
 }
