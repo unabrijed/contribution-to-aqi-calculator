@@ -1,11 +1,16 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { calculate, projections, benchmarkEquiv } from "@/lib/calc";
 import { getPPIBand, calcPPI, BENCHMARKS } from "@/data/catalog";
 import type { Selection } from "@/lib/calc";
-import ShareCard from "@/components/ShareCard";
+import ShareCard, { type ShareCardControls } from "@/components/ShareCard";
+import ShoonyaProductPopup from "@/components/ShoonyaProductPopup";
 import ShoonyaProductCard from "@/components/ShoonyaProductCard";
+import StickyActionBar, { STICKY_BAR_SCROLL_PADDING } from "@/components/StickyActionBar";
+import ResultsStepActions from "@/components/ResultsStepActions";
+
+const PRODUCT_POPUP_DELAY_MS = 2500;
 
 interface Props {
   selections: Selection[];
@@ -20,21 +25,72 @@ export default function ResultsScreen({ selections, onReset }: Props) {
   const annualG  = result.annual_pm25_g;
   const annualGFmt = annualG >= 1 ? `${annualG.toFixed(1)}g` : `${Math.round(annualG * 1000)}mg`;
 
-  return (
-    <div className="animate-in">
+  const [shareCardReady, setShareCardReady] = useState(false);
+  const [shareControls, setShareControls] = useState<ShareCardControls | null>(null);
+  const [showProductPopup, setShowProductPopup] = useState(false);
+  const [productOfferDismissed, setProductOfferDismissed] = useState(false);
+  const popupTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-      {/* ── Shoonya product card — top priority ─── */}
-      <div className="mb-6 animate-in">
-        <ShoonyaProductCard />
-      </div>
+  const handleProductPopupClose = useCallback(() => {
+    setShowProductPopup(false);
+    setProductOfferDismissed(true);
+  }, []);
+
+  const handleShareCardReady = useCallback(() => {
+    setShareCardReady(true);
+  }, []);
+
+  const handleShareControlsReady = useCallback((controls: ShareCardControls) => {
+    setShareControls(controls);
+  }, []);
+
+  const resultsActionProps = {
+    score: result.ppi_score,
+    band,
+    shareControls,
+    onReset,
+  };
+
+  useEffect(() => {
+    if (!shareCardReady) return;
+    popupTimerRef.current = setTimeout(() => {
+      setShowProductPopup(true);
+    }, PRODUCT_POPUP_DELAY_MS);
+    return () => {
+      if (popupTimerRef.current) clearTimeout(popupTimerRef.current);
+    };
+  }, [shareCardReady]);
+
+  return (
+    <div className={`animate-in ${STICKY_BAR_SCROLL_PADDING}`}>
+
+      <ShoonyaProductPopup
+        open={showProductPopup}
+        onClose={handleProductPopupClose}
+      />
+
+      {productOfferDismissed && (
+        <section className="mb-6 animate-in" aria-label="Shoonya Store product">
+          <p className="text-2xs font-mono text-ink-600 uppercase tracking-widest mb-3">
+            From Shoonya Store
+          </p>
+          <ShoonyaProductCard variant="inline" />
+        </section>
+      )}
+
+      <StickyActionBar position="top">
+        <ResultsStepActions {...resultsActionProps} variant="top" />
+      </StickyActionBar>
 
       {/* ── Share card ─────────────────────────── */}
-      <div className="mb-8 animate-in">
+      <div id="share-card-section" className="mb-8 animate-in scroll-mt-36">
         <ShareCard
           score={result.ppi_score}
           band={band}
           annualG={annualG}
           selections={selections}
+          onReady={handleShareCardReady}
+          onControlsReady={handleShareControlsReady}
         />
       </div>
 
@@ -171,7 +227,6 @@ export default function ResultsScreen({ selections, onReset }: Props) {
 
       {/* Sharecard moved to top */}
 
-      {/* Start over */}
       <div className="mt-10 pt-8 border-t border-[var(--border)] flex justify-center">
         <button
           type="button"
@@ -181,6 +236,10 @@ export default function ResultsScreen({ selections, onReset }: Props) {
           ← start over
         </button>
       </div>
+
+      <StickyActionBar position="bottom">
+        <ResultsStepActions {...resultsActionProps} variant="bottom" />
+      </StickyActionBar>
     </div>
   );
 }

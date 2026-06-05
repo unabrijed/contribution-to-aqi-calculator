@@ -6,6 +6,8 @@ import type { Selection } from "@/lib/calc";
 import { searchByName } from "@/lib/search";
 import { useDebouncedValue } from "@/lib/useDebouncedValue";
 import { SearchBox, SearchEmptyState, IndoorOutdoorFact } from "@/components/SearchBox";
+import StickyActionBar, { STICKY_BAR_SCROLL_PADDING } from "@/components/StickyActionBar";
+import BrandStepActions from "@/components/BrandStepActions";
 
 interface Props {
   categoryIds: string[];
@@ -105,6 +107,10 @@ export default function BrandStep({ categoryIds, selections, onChange, onBack, o
     ? "Set quantities →"
     : `Next: ${nextIncompleteLabel ?? "category"} →`;
 
+  const primaryLabelShort = categoriesComplete
+    ? "Quantities →"
+    : "Next →";
+
   const handlePrimary = () => {
     if (categoriesComplete) onNext();
     else if (firstIncompleteId) setActiveTab(firstIncompleteId);
@@ -128,8 +134,22 @@ export default function BrandStep({ categoryIds, selections, onChange, onBack, o
     ? "All indoor"
     : "Mixed";
 
+  const primaryHint = primaryDisabled
+    ? `Pick at least one brand in ${activeCat.label} to continue.`
+    : undefined;
+
+  const actionProps = {
+    onBack,
+    onPrimary: handlePrimary,
+    primaryDisabled,
+    primaryLabel,
+    primaryLabelShort,
+    footerSummary,
+    hint: primaryHint,
+  };
+
   return (
-    <div>
+    <div className={STICKY_BAR_SCROLL_PADDING}>
       <div className="mb-6">
         <h2 className="text-3xl font-display font-bold text-ink-50 mb-2">Choose your brands</h2>
         <p className="text-ink-400 text-sm">
@@ -180,6 +200,10 @@ export default function BrandStep({ categoryIds, selections, onChange, onBack, o
         </div>
         <IndoorOutdoorFact />
       </div>
+
+      <StickyActionBar position="top">
+        <BrandStepActions {...actionProps} variant="top" />
+      </StickyActionBar>
 
       {/* Category tabs */}
       {categories.length > 1 && (
@@ -395,34 +419,9 @@ export default function BrandStep({ categoryIds, selections, onChange, onBack, o
         )}
       </div>
 
-      {/* Footer */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <button
-          type="button"
-          onClick={onBack}
-          className="text-sm text-ink-500 hover:text-ink-300 transition-colors self-start min-h-[44px] flex items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember-400 focus-visible:rounded"
-        >
-          ← back
-        </button>
-        <div className="flex flex-col items-stretch gap-2 sm:items-end">
-          <span className="text-xs font-mono text-ink-500 text-right leading-relaxed">{footerSummary}</span>
-          {primaryDisabled && (
-            <span className="text-2xs text-ink-600 text-right" id="brand-next-hint">
-              Pick at least one brand in {activeCat.label} to continue.
-            </span>
-          )}
-          <button
-            type="button"
-            onClick={handlePrimary}
-            disabled={primaryDisabled}
-            aria-disabled={primaryDisabled}
-            aria-describedby={primaryDisabled ? "brand-next-hint" : undefined}
-            className="flex items-center justify-center gap-2 px-6 py-3 min-h-[44px] rounded-full bg-ember-500 text-white font-display font-medium text-sm disabled:opacity-30 disabled:cursor-not-allowed hover:bg-ember-600 active:scale-[0.98] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-0)]"
-          >
-            {primaryLabel}
-          </button>
-        </div>
-      </div>
+      <StickyActionBar position="bottom">
+        <BrandStepActions {...actionProps} variant="bottom" />
+      </StickyActionBar>
     </div>
   );
 }

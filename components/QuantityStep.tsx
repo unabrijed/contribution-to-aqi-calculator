@@ -6,6 +6,8 @@ import { searchByName } from "@/lib/search";
 import { useDebouncedValue } from "@/lib/useDebouncedValue";
 import type { Selection } from "@/lib/calc";
 import { SearchBox, SearchEmptyState, IndoorOutdoorFact } from "@/components/SearchBox";
+import StickyActionBar, { STICKY_BAR_SCROLL_PADDING } from "@/components/StickyActionBar";
+import QuantityStepActions from "@/components/QuantityStepActions";
 
 interface Props {
   selections: Selection[];
@@ -37,8 +39,18 @@ export default function QuantityStep({ selections, onChange, onBack, onNext }: P
     return acc + s.pm25_per_unit * s.qty * eff;
   }, 0);
 
+  const remaining = selections.length - reviewedCount;
+
+  const actionProps = {
+    onBack,
+    onNext,
+    allReviewed,
+    remaining,
+    totalDailyMg,
+  };
+
   return (
-    <div>
+    <div className={STICKY_BAR_SCROLL_PADDING}>
       <div className="mb-6">
         <h2 className="text-3xl font-display font-bold text-ink-50 mb-2">Daily intake</h2>
         <p className="text-ink-400 text-sm">
@@ -63,6 +75,10 @@ export default function QuantityStep({ selections, onChange, onBack, onNext }: P
           </div>
         </div>
       )}
+
+      <StickyActionBar position="top">
+        <QuantityStepActions {...actionProps} variant="top" />
+      </StickyActionBar>
 
       <SearchBox
         value={search}
@@ -239,36 +255,9 @@ export default function QuantityStep({ selections, onChange, onBack, onNext }: P
         <SearchEmptyState query={debouncedSearch} context="selections" />
       )}
 
-      {/* Running daily total */}
-      <div className="flex items-center justify-between p-4 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] mb-6">
-        <span className="text-sm text-ink-400">Estimated daily PM2.5</span>
-        <span className="text-lg font-mono font-medium text-ember-400" aria-live="polite" aria-label={`Estimated daily PM2.5: ${totalDailyMg >= 1000 ? `${(totalDailyMg / 1000).toFixed(2)} grams` : `${Math.round(totalDailyMg)} milligrams`}`}>
-          {totalDailyMg >= 1000
-            ? `${(totalDailyMg / 1000).toFixed(2)}g`
-            : `${Math.round(totalDailyMg)}mg`
-          }
-        </span>
-      </div>
-
-      {/* Footer */}
-      <div className="flex items-center justify-between">
-        <button
-          type="button"
-          onClick={onBack}
-          className="text-sm text-ink-500 hover:text-ink-300 transition-colors min-h-[44px] flex items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember-400 focus-visible:rounded"
-        >
-          ← back
-        </button>
-        <button
-          type="button"
-          onClick={onNext}
-          disabled={!allReviewed}
-          aria-disabled={!allReviewed}
-          className="flex items-center gap-2 px-6 py-3 min-h-[44px] rounded-full bg-ember-500 text-white font-display font-medium text-sm hover:bg-ember-600 active:scale-[0.98] transition-all disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-ember-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-0)]"
-        >
-          {allReviewed ? "Calculate my impact →" : `Review ${selections.length - reviewedCount} more →`}
-        </button>
-      </div>
+      <StickyActionBar position="bottom">
+        <QuantityStepActions {...actionProps} variant="bottom" />
+      </StickyActionBar>
     </div>
   );
 }

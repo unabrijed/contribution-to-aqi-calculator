@@ -1,22 +1,37 @@
 "use client";
 
-import { useRef, useState, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { BENCHMARKS, type PPIBand } from "@/data/catalog";
 import { benchmarkEquiv, type Selection } from "@/lib/calc";
 import { useTheme } from "next-themes";
 import { Share2 } from "lucide-react";
+
+export interface ShareCardControls {
+  share: () => void;
+  exporting: boolean;
+  shareLabel: string;
+}
 
 interface Props {
   score: number;
   band: PPIBand;
   annualG: number;
   selections: Selection[];
+  onReady?: () => void;
+  onControlsReady?: (controls: ShareCardControls) => void;
 }
 
-export default function ShareCard({ score, band, annualG, selections }: Props) {
+export default function ShareCard({ score, band, annualG, selections, onReady, onControlsReady }: Props) {
   const cardRef  = useRef<HTMLDivElement>(null);
   const [exporting, setExporting] = useState(false);
   const { theme, systemTheme } = useTheme();
+
+  const readySent = useRef(false);
+  useEffect(() => {
+    if (!onReady || readySent.current) return;
+    readySent.current = true;
+    onReady();
+  }, [onReady]);
 
   const canShareFile = useMemo(() => {
     if (typeof navigator === "undefined") return false;
@@ -70,7 +85,7 @@ export default function ShareCard({ score, band, annualG, selections }: Props) {
     URL.revokeObjectURL(url);
   };
 
-  const handleShare = async () => {
+  const handleShare = useCallback(async () => {
     setExporting(true);
     try {
       const blob = await generatePngBlob();
@@ -95,7 +110,19 @@ export default function ShareCard({ score, band, annualG, selections }: Props) {
     } finally {
       setExporting(false);
     }
-  };
+  }, [canShareFile, score]);
+
+  const shareLabel = canShareFile ? "Share card" : "Download card";
+
+  useEffect(() => {
+    onControlsReady?.({
+      share: () => {
+        void handleShare();
+      },
+      exporting,
+      shareLabel,
+    });
+  }, [handleShare, exporting, shareLabel, onControlsReady]);
 
   const selectedBm = BENCHMARKS.find(b => b.id === selectedBmId) || BENCHMARKS[0];
   const equivVal = benchmarkEquiv(annualG, selectedBm.rate_mg_per_unit);
@@ -234,9 +261,8 @@ export default function ShareCard({ score, band, annualG, selections }: Props) {
         {exporting
           ? (canShareFile ? "Sharing…" : "Saving…")
           : canShareFile
-            ? <><Share2 className="w-4 h-4" aria-hidden /> Share card</>
-            : "↓ Download card"
-        }
+            ? <><Share2 className="w-4 h-4" aria-hidden /> {shareLabel}</>
+            : `↓ ${shareLabel}`}
       </button>
     </div>
   );

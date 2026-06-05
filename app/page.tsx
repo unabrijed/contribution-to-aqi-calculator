@@ -23,6 +23,10 @@ export default function Home() {
     setSelections(prev => prev.filter(s => selectedCategories.includes(s.categoryId)));
   }, [selectedCategories]);
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+  }, [step]);
+
   const currentStepIndex = ["category", "brand", "quantity", "results"].indexOf(step);
 
   return (
