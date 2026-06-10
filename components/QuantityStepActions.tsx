@@ -11,8 +11,6 @@ import {
 interface Props {
   onBack: () => void;
   onNext: () => void;
-  allReviewed: boolean;
-  remaining: number;
   totalDailyMg: number;
   variant: "top" | "bottom";
 }
@@ -21,27 +19,13 @@ function formatDailyMg(mg: number) {
   return mg >= 1000 ? `${(mg / 1000).toFixed(2)}g` : `${Math.round(mg)}mg`;
 }
 
-function PrimaryLabels({ allReviewed, remaining }: { allReviewed: boolean; remaining: number }) {
-  if (allReviewed) {
-    return { short: "Calculate →", full: "Calculate my impact →" };
-  }
-  return {
-    short: `Review ${remaining} →`,
-    full: `Review ${remaining} more →`,
-  };
-}
-
 export default function QuantityStepActions({
   onBack,
   onNext,
-  allReviewed,
-  remaining,
   totalDailyMg,
   variant,
 }: Props) {
   const dailyLabel = formatDailyMg(totalDailyMg);
-  const hintId = "quantity-next-hint";
-  const labels = PrimaryLabels({ allReviewed, remaining });
 
   const dailyMeta = (
     <span className="shrink-0 font-mono text-2xs sm:text-xs font-medium text-ember-400 tabular-nums" aria-live="polite">
@@ -50,16 +34,9 @@ export default function QuantityStepActions({
   );
 
   const primaryButton = (
-    <button
-      type="button"
-      onClick={onNext}
-      disabled={!allReviewed}
-      aria-disabled={!allReviewed}
-      aria-describedby={!allReviewed ? hintId : undefined}
-      className={stickyPrimaryBtn}
-    >
-      <span className="truncate sm:hidden">{labels.short}</span>
-      <span className="truncate hidden sm:inline">{labels.full}</span>
+    <button type="button" onClick={onNext} className={stickyPrimaryBtn}>
+      <span className="truncate sm:hidden">Calculate →</span>
+      <span className="truncate hidden sm:inline">Calculate my impact →</span>
     </button>
   );
 
@@ -71,11 +48,6 @@ export default function QuantityStepActions({
           {dailyMeta}
           {primaryButton}
         </div>
-        {!allReviewed && (
-          <p className="text-2xs text-ink-600 sm:text-right">
-            Confirm each item below or tap &ldquo;Looks right&rdquo;
-          </p>
-        )}
       </div>
     );
   }
@@ -96,12 +68,6 @@ export default function QuantityStepActions({
         </span>
         <div className="ml-auto shrink-0">{primaryButton}</div>
       </div>
-      {!allReviewed && (
-        <p id={hintId} className="sr-only">
-          Confirm quantity and regularity for {remaining} more selected{" "}
-          {remaining === 1 ? "item" : "items"} to continue.
-        </p>
-      )}
     </div>
   );
 }

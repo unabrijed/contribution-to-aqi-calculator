@@ -345,7 +345,7 @@ export default function BrandStep({ categoryIds, selections, onChange, onBack, o
                       className={[
                         "relative text-left p-4 rounded-xl border transition-all duration-200 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-0)]",
                         sel
-                          ? "bg-ember-950/50 border-ember-600/60"
+                          ? "bg-[var(--ember-soft-bg)] border-ember-500/60"
                           : "bg-[var(--surface-1)] border-[var(--border)] hover:border-[var(--border-hover)] hover:bg-[var(--surface-2)]",
                       ].join(" ")}
                     >

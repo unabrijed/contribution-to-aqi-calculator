@@ -36,7 +36,7 @@ export default function Home() {
         aria-hidden
         className="pointer-events-none fixed top-0 left-1/2 -translate-x-1/2 w-[800px] h-[320px]"
         style={{
-          background: "radial-gradient(ellipse at 50% 0%, rgba(232,93,38,0.08) 0%, transparent 70%)",
+          background: "radial-gradient(ellipse at 50% 0%, var(--glow) 0%, transparent 70%)",
         }}
       />
 

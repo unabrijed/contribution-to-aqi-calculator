@@ -22,6 +22,15 @@
   --border: rgba(0,0,0,0.07);
   --border-hover: rgba(0,0,0,0.14);
 
+  /* Theme-aware utility tokens */
+  --gauge-track: rgba(0,0,0,0.08);
+  --scrim: rgba(15,23,42,0.45);
+  --ember-soft-bg: rgba(232,93,38,0.08);
+  --ember-soft-border: rgba(232,93,38,0.25);
+  --glow: rgba(232,93,38,0.05);
+
+  /* --ink-* is an INVERTED ramp: 50 = primary text, 950 = faintest.
+     It flips between light/dark so the same class reads correctly in both. */
   --ink-50: #080604;
   --ink-100: #0c0a09;
   --ink-200: #1c1917;
@@ -47,6 +56,13 @@
 
   --border: rgba(255,255,255,0.07);
   --border-hover: rgba(255,255,255,0.14);
+
+  /* Theme-aware utility tokens */
+  --gauge-track: rgba(255,255,255,0.06);
+  --scrim: rgba(0,0,0,0.6);
+  --ember-soft-bg: rgba(232,93,38,0.12);
+  --ember-soft-border: rgba(232,93,38,0.40);
+  --glow: rgba(232,93,38,0.08);
 
   --ink-50: #f5f5f4;
   --ink-100: #e7e5e4;
@@ -113,7 +129,7 @@ h1, h2, h3, h4 {
 /* ── Gauge arc ── */
 .gauge-track {
   fill: none;
-  stroke: rgba(255,255,255,0.06);
+  stroke: var(--gauge-track);
   stroke-width: 10;
 }
 .gauge-fill {

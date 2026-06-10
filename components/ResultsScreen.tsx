@@ -1,16 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { calculate, projections, benchmarkEquiv } from "@/lib/calc";
 import { getPPIBand, calcPPI, BENCHMARKS } from "@/data/catalog";
 import type { Selection } from "@/lib/calc";
 import ShareCard, { type ShareCardControls } from "@/components/ShareCard";
-import ShoonyaProductPopup from "@/components/ShoonyaProductPopup";
 import ShoonyaProductCard from "@/components/ShoonyaProductCard";
 import StickyActionBar, { STICKY_BAR_SCROLL_PADDING } from "@/components/StickyActionBar";
 import ResultsStepActions from "@/components/ResultsStepActions";
-
-const PRODUCT_POPUP_DELAY_MS = 2500;
 
 interface Props {
   selections: Selection[];
@@ -25,20 +22,7 @@ export default function ResultsScreen({ selections, onReset }: Props) {
   const annualG  = result.annual_pm25_g;
   const annualGFmt = annualG >= 1 ? `${annualG.toFixed(1)}g` : `${Math.round(annualG * 1000)}mg`;
 
-  const [shareCardReady, setShareCardReady] = useState(false);
   const [shareControls, setShareControls] = useState<ShareCardControls | null>(null);
-  const [showProductPopup, setShowProductPopup] = useState(false);
-  const [productOfferDismissed, setProductOfferDismissed] = useState(false);
-  const popupTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const handleProductPopupClose = useCallback(() => {
-    setShowProductPopup(false);
-    setProductOfferDismissed(true);
-  }, []);
-
-  const handleShareCardReady = useCallback(() => {
-    setShareCardReady(true);
-  }, []);
 
   const handleShareControlsReady = useCallback((controls: ShareCardControls) => {
     setShareControls(controls);
@@ -51,32 +35,8 @@ export default function ResultsScreen({ selections, onReset }: Props) {
     onReset,
   };
 
-  useEffect(() => {
-    if (!shareCardReady) return;
-    popupTimerRef.current = setTimeout(() => {
-      setShowProductPopup(true);
-    }, PRODUCT_POPUP_DELAY_MS);
-    return () => {
-      if (popupTimerRef.current) clearTimeout(popupTimerRef.current);
-    };
-  }, [shareCardReady]);
-
   return (
     <div className={`animate-in ${STICKY_BAR_SCROLL_PADDING}`}>
-
-      <ShoonyaProductPopup
-        open={showProductPopup}
-        onClose={handleProductPopupClose}
-      />
-
-      {productOfferDismissed && (
-        <section className="mb-6 animate-in" aria-label="Shoonya Store product">
-          <p className="text-2xs font-mono text-ink-600 uppercase tracking-widest mb-3">
-            From Shoonya Store
-          </p>
-          <ShoonyaProductCard variant="inline" />
-        </section>
-      )}
 
       <StickyActionBar position="top">
         <ResultsStepActions {...resultsActionProps} variant="top" />
@@ -89,7 +49,6 @@ export default function ResultsScreen({ selections, onReset }: Props) {
           band={band}
           annualG={annualG}
           selections={selections}
-          onReady={handleShareCardReady}
           onControlsReady={handleShareControlsReady}
         />
       </div>
@@ -158,7 +117,7 @@ export default function ResultsScreen({ selections, onReset }: Props) {
                 <div className="h-1 rounded-full bg-[var(--surface-3)] overflow-hidden">
                   <div
                     className="h-full rounded-full transition-all duration-700"
-                    style={{ width: `${row.share_pct}%`, background: "#e85d26" }}
+                    style={{ width: `${row.share_pct}%`, background: "var(--ember)" }}
                   />
                 </div>
               </div>
@@ -227,6 +186,14 @@ export default function ResultsScreen({ selections, onReset }: Props) {
 
       {/* Sharecard moved to top */}
 
+      {/* ── Shoonya Store object ─────────────────── */}
+      <section className="mb-8" aria-label="Shoonya Store product">
+        <h3 className="text-xs font-mono text-ink-500 uppercase tracking-widest mb-3">
+          Meanwhile, on Shoonya Store
+        </h3>
+        <ShoonyaProductCard variant="editorial" />
+      </section>
+
       <div className="mt-10 pt-8 border-t border-[var(--border)] flex justify-center">
         <button
           type="button"
@@ -257,7 +224,7 @@ function GaugeSVG({ score, color }: { score: number; color: string }) {
       {/* track */}
       <path
         d={`M ${cx - R} ${cy} A ${R} ${R} 0 0 1 ${cx + R} ${cy}`}
-        fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="8"
+        fill="none" stroke="var(--gauge-track)" strokeWidth="8"
       />
       {/* coloured segments */}
       {BANDS.map((c, i) => {

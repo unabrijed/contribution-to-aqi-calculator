@@ -6,9 +6,9 @@ export default function LandingScreen({ onStart }: Props) {
   return (
     <div className="py-8">
       {/* Disclaimer pill */}
-      <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-ember-800/60 bg-ember-950/40 mb-10">
+      <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-[var(--ember-soft-border)] bg-[var(--ember-soft-bg)] mb-10">
         <span className="w-1.5 h-1.5 rounded-full bg-ember-500 animate-pulse" aria-hidden />
-        <span className="text-xs font-mono text-ember-400 tracking-wide">
+        <span className="text-xs font-mono text-ember-600 dark:text-ember-400 tracking-wide">
           We do not support or encourage smoking
         </span>
       </div>
